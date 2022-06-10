@@ -623,6 +623,8 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
                 iterator.remove();
         }
 
+        resolveParameterNamingConflicts(objs);
+
         boolean addedTimeImport = false;
         boolean addedOSImport = false;
         for (ModelMap m : objs.getModels()) {
@@ -853,5 +855,28 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
     @Override
     public GeneratorLanguage generatorLanguage() {
         return GeneratorLanguage.GO;
+    }
+
+    private void resolveParameterNamingConflicts(ModelsMap objs) {
+        for (ModelMap m : objs.getModels()) {
+            CodegenModel model = m.getModel();
+            for (CodegenProperty param : model.vars) {
+                class Local<T> {
+                    public T value;
+                }
+
+                final Local<String> pName = new Local<>();
+                pName.value = param.name;
+
+                while (model.vars.stream().filter(o -> ("Get" + o.name).equals(pName.value)).findFirst().isPresent()
+                        || model.vars.stream().filter(o -> ("Get" + o.name + "Ok").equals(pName.value)).findFirst().isPresent()
+                        || model.vars.stream().filter(o -> ("Has" + o.name).equals(pName.value)).findFirst().isPresent()
+                        || model.vars.stream().filter(o -> ("Set" + o.name).equals(pName.value)).findFirst().isPresent()) {
+                    pName.value += "_";
+                }
+
+                param.name = pName.value;
+            }
+        }
     }
 }
