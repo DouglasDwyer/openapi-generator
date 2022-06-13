@@ -3586,6 +3586,7 @@ public class DefaultCodegen implements CodegenConfig {
         }
 
         property.dataType = getTypeDeclaration(p);
+
         property.dataFormat = p.getFormat();
         property.baseType = getSchemaType(p);
 
@@ -5337,6 +5338,7 @@ public class DefaultCodegen implements CodegenConfig {
                 LOGGER.warn("Please report the issue. There shouldn't be null property for {}", key);
             } else {
                 final CodegenProperty cp = fromProperty(key, prop);
+
                 cp.required = mandatory.contains(key);
                 vars.add(cp);
                 if (cm == null) {

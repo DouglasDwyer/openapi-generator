@@ -10,10 +10,7 @@ type {{classname}} struct {
 	Items {{{parent}}}
 {{/isArray}}
 {{/parent}}
-{{#allParents}}
-	{{.}}
-{{/allParents}}
-{{#vars}}
+{{#allVars}}
 {{^-first}}
 {{/-first}}
 {{#description}}
@@ -23,7 +20,7 @@ type {{classname}} struct {
 	// Deprecated
 {{/deprecated}}
 	{{name}} {{^required}}{{^isNullable}}{{^isArray}}{{^isFreeFormObject}}*{{/isFreeFormObject}}{{/isArray}}{{/isNullable}}{{/required}}{{{dataType}}} `json:"{{baseName}}{{^required}},omitempty{{/required}}"{{#withXml}} xml:"{{baseName}}{{#isXmlAttribute}},attr{{/isXmlAttribute}}"{{/withXml}}{{#vendorExtensions.x-go-custom-tag}} {{{.}}}{{/vendorExtensions.x-go-custom-tag}}`
-{{/vars}}
+{{/allVars}}
 {{#isAdditionalPropertiesTrue}}
 	AdditionalProperties map[string]interface{}
 {{/isAdditionalPropertiesTrue}}
@@ -68,7 +65,7 @@ func New{{classname}}({{#requiredVars}}{{nameInCamelCase}} {{dataType}}{{^-last}
 // but it doesn't guarantee that properties required by API are set
 func New{{classname}}WithDefaults() *{{classname}} {
 	this := {{classname}}{}
-{{#vars}}
+{{#allVars}}
 {{#defaultValue}}
 {{^vendorExtensions.x-golang-is-container}}
 {{^isReadOnly}}
@@ -84,11 +81,11 @@ func New{{classname}}WithDefaults() *{{classname}} {
 {{/isReadOnly}}
 {{/vendorExtensions.x-golang-is-container}}
 {{/defaultValue}}
-{{/vars}}
+{{/allVars}}
 	return &this
 }
 
-{{#vars}}
+{{#allVars}}
 {{#required}}
 // Get{{name}} returns the {{name}} field value
 {{#isNullable}}
@@ -249,7 +246,7 @@ func (o *{{classname}}) Unset{{name}}() {
 {{/isNullable}}
 
 {{/required}}
-{{/vars}}
+{{/allVars}}
 func (o {{classname}}) MarshalJSON() ([]byte, error) {
 	toSerialize := {{#isArray}}make([]interface{}, len(o.Items)){{/isArray}}{{^isArray}}map[string]interface{}{}{{/isArray}}
 	{{#parent}}
@@ -271,7 +268,7 @@ func (o {{classname}}) MarshalJSON() ([]byte, error) {
 	}
 	{{/isArray}}
 	{{/parent}}
-	{{#vars}}
+	{{#allVars}}
 	{{! if argument is nullable, only serialize it if it is set}}
 	{{#isNullable}}
 	{{#vendorExtensions.x-golang-is-container}}
@@ -292,7 +289,7 @@ func (o {{classname}}) MarshalJSON() ([]byte, error) {
 		toSerialize["{{baseName}}"] = o.{{name}}
 	}
 	{{/isNullable}}
-	{{/vars}}
+	{{/allVars}}
 	{{#isAdditionalPropertiesTrue}}
 
 	for key, value := range o.AdditionalProperties {
@@ -308,7 +305,7 @@ func (o *{{{classname}}}) UnmarshalJSON(bytes []byte) (err error) {
 {{#parent}}
 {{^isMap}}
 	type {{classname}}WithoutEmbeddedStruct struct {
-	{{#vars}}
+	{{#allVars}}
 	{{^-first}}
 	{{/-first}}
 	{{#description}}
@@ -318,7 +315,7 @@ func (o *{{{classname}}}) UnmarshalJSON(bytes []byte) (err error) {
 		// Deprecated
 	{{/deprecated}}
 		{{name}} {{^required}}{{^isNullable}}{{^isArray}}{{^isFreeFormObject}}*{{/isFreeFormObject}}{{/isArray}}{{/isNullable}}{{/required}}{{{dataType}}} `json:"{{baseName}}{{^required}},omitempty{{/required}}"{{#withXml}} xml:"{{baseName}}{{#isXmlAttribute}},attr{{/isXmlAttribute}}"{{/withXml}}{{#vendorExtensions.x-go-custom-tag}} {{{.}}}{{/vendorExtensions.x-go-custom-tag}}`
-	{{/vars}}
+	{{/allVars}}
 	}
 
 	var{{{classname}}}WithoutEmbeddedStruct := {{{classname}}}WithoutEmbeddedStruct{}
@@ -326,9 +323,9 @@ func (o *{{{classname}}}) UnmarshalJSON(bytes []byte) (err error) {
 	err = json.Unmarshal(bytes, &var{{{classname}}}WithoutEmbeddedStruct)
 	if err == nil {
 		var{{{classname}}} := _{{{classname}}}{}
-		{{#vars}}
+		{{#allVars}}
 		var{{{classname}}}.{{{name}}} = var{{{classname}}}WithoutEmbeddedStruct.{{{name}}}
-		{{/vars}}
+		{{/allVars}}
 		*o = {{{classname}}}(var{{{classname}}})
 	} else {
 		return err
@@ -346,9 +343,9 @@ func (o *{{{classname}}}) UnmarshalJSON(bytes []byte) (err error) {
 	additionalProperties := make(map[string]interface{})
 
 	if err = json.Unmarshal(bytes, &additionalProperties); err == nil {
-		{{#vars}}
+		{{#allVars}}
 		delete(additionalProperties, "{{{baseName}}}")
-		{{/vars}}
+		{{/allVars}}
 
 		// remove fields from embedded structs
 		reflect{{{parent}}} := reflect.ValueOf(o.{{{parent}}})
@@ -383,9 +380,9 @@ func (o *{{{classname}}}) UnmarshalJSON(bytes []byte) (err error) {
 	additionalProperties := make(map[string]interface{})
 
 	if err = json.Unmarshal(bytes, &additionalProperties); err == nil {
-		{{#vars}}
+		{{#allVars}}
 		delete(additionalProperties, "{{{baseName}}}")
-		{{/vars}}
+		{{/allVars}}
 		o.AdditionalProperties = additionalProperties
 	}
 
@@ -402,9 +399,9 @@ func (o *{{{classname}}}) UnmarshalJSON(bytes []byte) (err error) {
 	additionalProperties := make(map[string]interface{})
 
 	if err = json.Unmarshal(bytes, &additionalProperties); err == nil {
-		{{#vars}}
+		{{#allVars}}
 		delete(additionalProperties, "{{{baseName}}}")
-		{{/vars}}
+		{{/allVars}}
 		o.AdditionalProperties = additionalProperties
 	}
 

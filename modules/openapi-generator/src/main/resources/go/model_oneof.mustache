@@ -15,6 +15,127 @@ func {{#lambda.type-to-name}}{{{.}}}{{/lambda.type-to-name}}As{{classname}}(v *{
 
 {{/oneOf}}
 
+
+{{#allVars}}
+{{#required}}
+// Get{{name}} returns the {{name}} field value
+{{#isNullable}}
+// If the value is explicit nil, the zero value for {{vendorExtensions.x-go-base-type}} will be returned
+{{/isNullable}}
+{{#deprecated}}
+// Deprecated
+{{/deprecated}}
+func (o *{{classname}}) Get{{name}}() {{vendorExtensions.x-go-base-type}} {
+	type getResult interface {
+		Get{{name}}() {{vendorExtensions.x-go-base-type}}
+	}
+
+	return o.GetActualInstance().(getResult).Get{{name}}()
+}
+
+// Get{{name}}Ok returns a tuple with the {{name}} field value
+// and a boolean to check if the value has been set.
+{{#isNullable}}
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+{{/isNullable}}
+{{#deprecated}}
+// Deprecated
+{{/deprecated}}
+func (o *{{classname}}) Get{{name}}Ok() ({{^isArray}}{{^isFreeFormObject}}*{{/isFreeFormObject}}{{/isArray}}{{vendorExtensions.x-go-base-type}}, bool) {
+	type getResult interface {
+		Get{{name}}Ok() ({{^isArray}}{{^isFreeFormObject}}*{{/isFreeFormObject}}{{/isArray}}{{vendorExtensions.x-go-base-type}}, bool)
+	}
+
+	return o.GetActualInstance().(getResult).Get{{name}}Ok()
+}
+
+// Set{{name}} sets field value
+{{#deprecated}}
+// Deprecated
+{{/deprecated}}
+func (o *{{classname}}) Set{{name}}(v {{vendorExtensions.x-go-base-type}}) {
+	type getResult interface {
+		Set{{name}}(v {{vendorExtensions.x-go-base-type}})
+	}
+
+	o.GetActualInstance().(getResult).Set{{name}}(v)
+}
+
+{{/required}}
+{{^required}}
+// Get{{name}} returns the {{name}} field value if set, zero value otherwise{{#isNullable}} (both if not set or set to explicit null){{/isNullable}}.
+{{#deprecated}}
+// Deprecated
+{{/deprecated}}
+func (o *{{classname}}) Get{{name}}() {{vendorExtensions.x-go-base-type}} {
+	type getResult interface {
+		Get{{name}}() {{vendorExtensions.x-go-base-type}}
+	}
+
+	return o.GetActualInstance().(getResult).Get{{name}}()
+}
+
+// Get{{name}}Ok returns a tuple with the {{name}} field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+{{#isNullable}}
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+{{/isNullable}}
+{{#deprecated}}
+// Deprecated
+{{/deprecated}}
+func (o *{{classname}}) Get{{name}}Ok() ({{^isArray}}{{^isFreeFormObject}}*{{/isFreeFormObject}}{{/isArray}}{{vendorExtensions.x-go-base-type}}, bool) {
+	type getResult interface {
+		Get{{name}}Ok() ({{^isArray}}{{^isFreeFormObject}}*{{/isFreeFormObject}}{{/isArray}}{{vendorExtensions.x-go-base-type}}, bool)
+	}
+
+	return o.GetActualInstance().(getResult).Get{{name}}Ok()
+}
+
+// Has{{name}} returns a boolean if a field has been set.
+func (o *{{classname}}) Has{{name}}() bool {
+	type getResult interface {
+		Has{{name}}() bool
+	}
+
+	return o.GetActualInstance().(getResult).Has{{name}}()
+}
+
+// Set{{name}} gets a reference to the given {{dataType}} and assigns it to the {{name}} field.
+{{#deprecated}}
+// Deprecated
+{{/deprecated}}
+func (o *{{classname}}) Set{{name}}(v {{vendorExtensions.x-go-base-type}}) {
+	type getResult interface {
+		Set{{name}}(v {{vendorExtensions.x-go-base-type}})
+	}
+
+	o.GetActualInstance().(getResult).Set{{name}}(v)
+}
+{{#isNullable}}
+{{^vendorExtensions.x-golang-is-container}}
+// Set{{name}}Nil sets the value for {{name}} to be an explicit nil
+func (o *{{classname}}) Set{{name}}Nil() {
+	type getResult interface {
+		Set{{name}}Nil()
+	}
+
+	o.GetActualInstance().(getResult).Set{{name}}Nil()
+}
+
+// Unset{{name}} ensures that no value is present for {{name}}, not even an explicit nil
+func (o *{{classname}}) Unset{{name}}() {
+	type getResult interface {
+		Unset{{name}}()
+	}
+
+	o.GetActualInstance().(getResult).Unset{{name}}()
+}
+{{/vendorExtensions.x-golang-is-container}}
+{{/isNullable}}
+
+{{/required}}
+{{/allVars}}
+
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *{{classname}}) UnmarshalJSON(data []byte) error {
 	var err error

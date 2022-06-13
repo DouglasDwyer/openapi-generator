@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 import static org.openapitools.codegen.utils.StringUtils.underscore;
@@ -57,8 +58,6 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
 
     public AbstractGoCodegen() {
         super();
-
-        LOGGER.error("Running custom");
 
         supportsInheritance = true;
         supportsMultipleInheritance = true;
@@ -627,12 +626,13 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
         }
 
         resolveParameterNamingConflicts(objs);
+        addUnconstrainedDiscriminatorInheritance(objs);
 
         boolean addedTimeImport = false;
         boolean addedOSImport = false;
         for (ModelMap m : objs.getModels()) {
             CodegenModel model = m.getModel();
-            for (CodegenProperty param : model.vars) {
+            for (CodegenProperty param : model.allVars) {
                 if (!addedTimeImport
                     && ("time.Time".equals(param.dataType) || ("[]time.Time".equals(param.dataType)))) {
                     imports.add(createMapping("import", "time"));
@@ -863,7 +863,7 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
     private void resolveParameterNamingConflicts(ModelsMap objs) {
         for (ModelMap m : objs.getModels()) {
             CodegenModel model = m.getModel();
-            for (CodegenProperty param : model.vars) {
+            for (CodegenProperty param : model.allVars) {
                 class Local<T> {
                     public T value;
                 }
@@ -871,14 +871,29 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
                 final Local<String> pName = new Local<>();
                 pName.value = param.name;
 
-                while (model.vars.stream().filter(o -> ("Get" + o.name).equals(pName.value)).findFirst().isPresent()
-                        || model.vars.stream().filter(o -> ("Get" + o.name + "Ok").equals(pName.value)).findFirst().isPresent()
-                        || model.vars.stream().filter(o -> ("Has" + o.name).equals(pName.value)).findFirst().isPresent()
-                        || model.vars.stream().filter(o -> ("Set" + o.name).equals(pName.value)).findFirst().isPresent()) {
+                while (model.allVars.stream().filter(o ->
+                        ("Get" + o.name).equals(pName.value)
+                        || ("Get" + o.name + "Ok").equals(pName.value)
+                        || ("Has" + o.name).equals(pName.value)
+                        || ("Set" + o.name).equals(pName.value)).findFirst().isPresent()) {
                     pName.value += "_";
                 }
 
                 param.name = pName.value;
+            }
+        }
+    }
+
+    private void addUnconstrainedDiscriminatorInheritance(ModelsMap objs) {
+        for (ModelMap m : objs.getModels()) {
+            CodegenModel model = m.getModel();
+            if ((model.oneOf == null || model.oneOf.isEmpty()) && model.discriminator != null) {
+                Set<String> inheritedModels = new HashSet<>(model.discriminator.getMappedModels().stream()
+                        .map(x -> x.getModelName()).collect(Collectors.toList()));
+
+                if (!inheritedModels.contains(model.classname)) {
+                    model.oneOf = inheritedModels;
+                }
             }
         }
     }

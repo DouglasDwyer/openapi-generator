@@ -1239,7 +1239,7 @@ public class ModelUtils {
                     }
                 }
             } else if (isObjectSchema(ref)) { // model
-                if (ref.getProperties() != null && !ref.getProperties().isEmpty()) { // has at least one property
+                if ((ref.getProperties() != null && !ref.getProperties().isEmpty()) || isDisallowAdditionalPropertiesIfNotPresent() || new Boolean(false).equals(ref.getAdditionalProperties())) { // has at least one property
                     if (hasSelfReference(openAPI, ref)) {
                         // it's self referencing so returning itself instead
                         return schema;

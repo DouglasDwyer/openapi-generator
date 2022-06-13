@@ -488,6 +488,9 @@ public class DefaultGenerator implements Generator {
 
                 Map<String, Schema> schemaMap = new HashMap<>();
                 schemaMap.put(name, schema);
+
+                // dwyer
+
                 ModelsMap models = processModels(config, schemaMap);
                 models.put("classname", config.toModelName(name));
                 models.putAll(config.additionalProperties());
