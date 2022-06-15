@@ -593,6 +593,9 @@ public class InlineModelResolver {
     }
 
     private String matchGenerated(Schema model) {
+        if (true) {
+            return null;
+        }
         try {
             String json = structureMapper.writeValueAsString(model);
             if (generatedSignature.containsKey(json)) {
@@ -846,7 +849,7 @@ public class InlineModelResolver {
      * Add the schemas to the components
      *
      * @param name   name of the inline schema
-     * @param schema inilne schema
+     * @param schema inline schema
      * @return the actual model name (based on inlineSchemaNameMapping if provied)
      */
     private String addSchemas(String name, Schema schema) {
